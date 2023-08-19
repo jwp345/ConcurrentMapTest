@@ -38,7 +38,7 @@ putAll() 메소드로 새로운 정보를 넣을 때 synchronized()로 다른 �
       
       ![락 공유 modifyMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/555b4719-1ea5-440c-b40d-287d623151eb)
 
-    + 공유객체에서 get()을 실행하는 클래스
+    + 공유객체에서 get()을 실행하는 클래스에서 lock 획득만 시도하고 잠금을 걸지 않음
    
       ![락 공유 getMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/893edc4d-7ace-4662-8aa1-c971d0ab8247)
 
@@ -47,14 +47,16 @@ putAll() 메소드로 새로운 정보를 넣을 때 synchronized()로 다른 �
       ![lock 공유 결과](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/af4038f1-335a-41e5-b303-1cdca0d0bd81)
 
   + 방법 2 : get 메소드 내에 공유 객체 잠금으로 인한 동기화
-    + 공유객체에서 get() 메소드에 synchronized() 블록 생성
+    + 공유객체에서 get() 메소드 호출할 때마다 객체 잠금
       
       ![방법2 getMap synchronized 객체 잠금](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/fe89b7f7-fe2e-4dda-87b2-92e8a4acba09)
     + 결과 : 성공
    
       ![lock 공유 결과](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/af4038f1-335a-41e5-b303-1cdca0d0bd81)
 
-    + 이 방법이 안좋은 이유 : 현재 회사 코드에서 같은 클래스 내부에 ConcurrentHashMap.get() 메소드를 여러 메소드에서 사용하고 있다. 이렇게 사용할 경우, HashTable()객체를 사용하는 것과 다름이 없어짐(여러 스레드에서 조회 할 때 마다 락이 걸림)
+  + 둘 중 어느 방법을 택할 것인가?
+      + 현재 회사 코드에서 같은 클래스 내부에 ConcurrentHashMap.get() 메소드를 여러 메소드에서 사용하고 있다. 방법 2를 사용할 경우 get 메소드를 호출할 때마다 객체에 락이 걸려 HashTable를 사용하는 것과 다름이 없어짐
+      + 방법 2는 get메소드 호출 시 락을 걸진 않고 락 획득만 시도함. 따라서, 스케줄러 메소드가 실행될 때만 락이 걸리게 하고 싶으므로 방법 1을 선택
 
 ### 해결방안
 1. 공유 잠금을 생성 하여 스케줄러 메소드가 실행될 때 get이 실행될 때마다 락 획득을 시킬 수 있다.
