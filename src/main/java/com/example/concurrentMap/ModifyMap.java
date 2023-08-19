@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ModifyMap {
     public static final Map<String, String> cMap = new ConcurrentHashMap<>();
-    public static final Lock lock = new ReentrantLock();
+//    public static final Lock lock = new ReentrantLock();
 
     public ModifyMap() {
         cMap.put("1", "1");
@@ -15,8 +15,7 @@ public class ModifyMap {
     }
 
     public void clearAndPut() {
-        lock.lock();
-        try {
+        synchronized (cMap){
             cMap.clear();
             try {
                 Thread.sleep(2000);
@@ -25,8 +24,6 @@ public class ModifyMap {
             }
             cMap.put("3", "3");
             cMap.put("4", "4");
-        } finally {
-            lock.unlock();
         }
     }
 }
