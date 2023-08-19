@@ -6,6 +6,8 @@ import static com.example.concurrentMap.ModifyMap.cMap;
 
 public class GetMap {
     public String get() {
-        return cMap.get("3");
+        synchronized (cMap) {
+            return cMap.get("3");
+        }
     }
 }
