@@ -20,39 +20,39 @@ putAll() 메소드로 새로운 정보를 넣을 때 synchronized()로 다른 �
   + 실패 케이스 : 만약 put메소드가 실행될 때까지 기다리지 않는다면 null을 반환할 것임.
   + 문제 상황
     + 스케줄러 클래스(여기선 스케줄러로 만들지 않음)(ConcurrentHashMap을 제어하는 클래스)
-      ![synchronized modifyMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/5aeb81f4-f914-4127-8e50-ea0781f45c97)
+      ![synchronized modifyMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/155849e5-be03-4b3d-a4c9-6d60a3bcc184)
     
     + 공유 객체(ConcurrentHashMap)에서 get() 실행하는 클래스
       
-       ![synchronized getMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/e431cbde-0977-4bbf-a8ae-9ae5278ab8d2)
+       ![synchronized getMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/60dd57f1-0b48-42f6-ad48-c5b1fadb249d)
     + 테스트 코드
    
-      ![테스트에 사용한 코드](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/b5962913-8288-4d8d-9bf2-d344d64475e7)
+      ![테스트에 사용한 코드](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/f978f2c0-6cad-46c2-9807-6120704f5dee)
 
     + 결과 : null 반환
    
-      ![문제 상황](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/b3510a2b-22eb-4868-b414-5bd2e9750ad8)
+      ![문제 상황](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/7fd469c3-d2fd-449e-88db-321a4b9d87fe)
       
   + 방법 1 : 공유락 객체 생성으로 인한 동기화 해결
     + 스케줄러 클래스
       
-      ![락 공유 modifyMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/555b4719-1ea5-440c-b40d-287d623151eb)
+      ![락 공유 modifyMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/ca1ec90b-68c7-4bed-824c-d41002f15a8a)
 
     + 공유객체에서 get()을 실행하는 클래스에서 lock 획득만 시도하고 잠금을 걸지 않음
    
-      ![락 공유 getMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/893edc4d-7ace-4662-8aa1-c971d0ab8247)
+      ![락 공유 getMap](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/f146fc8f-ed3a-441b-9d92-f972c8608994)
 
     + 결과 : 성공
    
-      ![lock 공유 결과](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/af4038f1-335a-41e5-b303-1cdca0d0bd81)
+      ![lock 공유 결과](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/f4e65e63-97fc-4f53-ac91-82c5be10275b)
 
   + 방법 2 : get 메소드 내에 공유 객체 잠금으로 인한 동기화
     + 공유객체에서 get() 메소드 호출할 때마다 객체 잠금
       
-      ![방법2 getMap synchronized 객체 잠금](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/fe89b7f7-fe2e-4dda-87b2-92e8a4acba09)
+      ![방법2 getMap synchronized 객체 잠금](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/b1f349a3-5b55-4fdb-9416-6367b11730ee)
     + 결과 : 성공
    
-      ![lock 공유 결과](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/af4038f1-335a-41e5-b303-1cdca0d0bd81)
+      ![lock 공유 결과](https://github.com/jwp345/ConcurrentMapTest/assets/35333297/f4e65e63-97fc-4f53-ac91-82c5be10275b)
 
   + 둘 중 어느 방법을 택할 것인가?
       + 현재 회사 코드에서 같은 클래스 내부에 ConcurrentHashMap.get() 메소드를 여러 메소드에서 사용하고 있다. 방법 2를 사용할 경우 get 메소드를 호출할 때마다 객체에 락이 걸려 HashTable를 사용하는 것과 다름이 없어짐
